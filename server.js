@@ -24,3 +24,41 @@ app.get('/', function(req, res) {
 
 app.listen(port);
 console.log('Listening @ http://localhost:' + port);
+
+app.get('/setup', function(req, res) {
+
+  // create a sample user
+  // passwords in reality would NEVER be saved as plaintext. Would normally be
+  // hashed and salted!
+  var cecil = new User({
+    name: 'Cecil Sagehen',
+    password: 'password',
+    admin: true
+  });
+
+  cecil.save(function(err) {
+    if (err) throw err;
+
+    console.log('User saved successfully');
+    res.json({ success: true });
+  });
+});
+
+//======== API ROUTES ========
+
+var apiRoutes = express.Router();
+
+// TODO: route to authenticate a user
+// TODO: token verification
+
+apiRoutes.get('/', function(req, res) {
+  res.json({ message: 'Welcome to the API!' });
+});
+
+apiRoutes.get('/users', function(req, res) {
+  User.find({}, function(err, users) {
+    res.json(users);
+  });
+});
+
+app.use('/api', apiRoutes)
