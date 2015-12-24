@@ -2,6 +2,7 @@
   "name": "node-token-jwt-rw",
   "main": "server.js",
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",
     "express": "^4.13.3",
     "jsonwebtoken": "^5.4.1",

@@ -32,7 +32,7 @@ app.get('/setup', function(req, res) {
   // hashed and salted!
   var cecil = new User({
     name: 'Cecil Sagehen',
-    password: 'password',
+    password: 'terriblepassword',
     admin: true
   });
 
@@ -61,19 +61,21 @@ apiRoutes.post('/authenticate', function(req, res) {
       res.json({ success: false, message: 'Auth failed. User not found.'});
     } else if (user) {
 
-      if (user.password !== req.body.password) {
-        res.json({ success: false, message: 'Auth fail. Wrong pass.'})
-      } else {
-        var token = jwt.sign(user, 'aSecret', {
-          expiresIn: 600
-        });
+      user.comparePassword(req.body.password, function(err, isMatch) {
+        if (!isMatch) {
+          res.json({ success: false, message: 'Auth fail. Wrong pass.'})
+        } else {
+          var token = jwt.sign(user, 'aSecret', {
+            expiresIn: 600
+          });
 
-        res.json({
-          success: true,
-          message: 'Yes for jwt!',
-          token: token
-        });
-      }
+          res.json({
+            success: true,
+            message: 'Yes for jwt!',
+            token: token
+          });
+        }
+      })
     }
   });
 });
