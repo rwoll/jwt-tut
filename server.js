@@ -49,6 +49,34 @@ app.get('/setup', function(req, res) {
 var apiRoutes = express.Router();
 
 // TODO: route to authenticate a user
+apiRoutes.post('/authenticate', function(req, res) {
+  User.findOne({
+    name: req.body.name
+  }, function(err, user) {
+    if (err) throw err;
+
+    // In reality, we would not want to return this much information about errors
+    // we would only want to say that there was a failure
+    if (!user) {
+      res.json({ success: false, message: 'Auth failed. User not found.'});
+    } else if (user) {
+
+      if (user.password !== req.body.password) {
+        res.json({ success: false, message: 'Auth fail. Wrong pass.'})
+      } else {
+        var token = jwt.sign(user, 'secret', {
+          expiresIn: 600
+        });
+
+        res.json({
+          success: true,
+          message: 'Yes for jwt!',
+          token: token
+        });
+      }
+    }
+  });
+});
 // TODO: token verification
 
 apiRoutes.get('/', function(req, res) {
