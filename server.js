@@ -64,7 +64,7 @@ apiRoutes.post('/authenticate', function(req, res) {
       if (user.password !== req.body.password) {
         res.json({ success: false, message: 'Auth fail. Wrong pass.'})
       } else {
-        var token = jwt.sign(user, 'secret', {
+        var token = jwt.sign(user, 'aSecret', {
           expiresIn: 600
         });
 
@@ -77,7 +77,29 @@ apiRoutes.post('/authenticate', function(req, res) {
     }
   });
 });
-// TODO: token verification
+
+// authenticate JWT
+apiRoutes.use(function(req, res, next) {
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  if (token) {
+
+    jwt.verify(token,'aSecret', function(err, decoded) {
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate jwt.'});
+      } else {
+        req.decoded = decoded;
+        next();
+      }
+    });
+  } else {
+
+    return res.status(403).send({
+      success: false,
+      message: 'No token provided.'
+    });
+  }
+});
 
 apiRoutes.get('/', function(req, res) {
   res.json({ message: 'Welcome to the API!' });
